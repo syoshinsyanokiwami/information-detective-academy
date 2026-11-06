@@ -328,11 +328,49 @@ const READINGS={
   "続き": "つづき",
   "役": "やく",
   "隠して": "かくして",
-  "聞いた": "きいた"
+  "聞いた": "きいた",
+  "今回": "こんかい",
+  "写っている": "うつっている",
+  "撮った": "とった",
+  "撮り直す": "とりなおす",
+  "外す": "はずす",
+  "外": "そと",
+  "別に": "べつに",
+  "知らない": "しらない",
+  "通う": "かよう",
+  "付く": "つく",
+  "決める": "きめる",
+  "理由": "りゆう",
+  "一度": "いちど",
+  "声": "こえ",
+  "出して": "だして",
+  "編集前": "へんしゅうまえ",
+  "編集後": "へんしゅうご",
+  "見せた": "みせた",
+  "見つけて": "みつけて",
+  "学校名": "がっこうめい",
+  "か所": "かしょ",
+  "戻せる": "もどせる",
+  "確かめたい": "たしかめたい",
+  "決めよう": "きめよう",
+  "押す": "おす"
 };
 
+// Match each kana run literally so only the remaining kanji receive readings.
+// Keep compound readings together (for example, 今日 → きょう).
+const READING_KANJI=/^[\p{Script=Han}々]+$/u;
+const escapeReadingPattern=text=>text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const READING_PARTS=Object.fromEntries(Object.entries(READINGS).flatMap(([word,reading])=>{
+ const parts=word.match(/[\p{Script=Han}々]+|[^\p{Script=Han}々]+/gu);
+ const pattern=parts.map(part=>READING_KANJI.test(part)?'(.+?)':escapeReadingPattern(part)).join('');
+ const match=new RegExp('^'+pattern+'$','u').exec(reading);
+ // Omit an inconsistent dictionary entry instead of guessing a reading.
+ if(!match)return [];
+ let at=1;
+ return [[word,parts.map(text=>({text,reading:READING_KANJI.test(text)?match[at++]:null}))]];
+}));
 const READING_SKIP='ruby,script,style,textarea,input,select,option,svg,canvas,[data-user-text]';
-const readingPattern=new RegExp(Object.keys(READINGS).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),'gu');
+const readingPattern=new RegExp(Object.keys(READING_PARTS).sort((a,b)=>b.length-a.length).map(escapeReadingPattern).join('|'),'gu');
 function applyReadings(root){
  if(!root||!root.isConnected||root.nodeType===1&&root.closest(READING_SKIP))return;
  const nodes=[];
@@ -350,8 +388,11 @@ function applyReadings(root){
   const fragment=document.createDocumentFragment();let at=0;
   for(const match of matches){
    fragment.append(document.createTextNode(text.slice(at,match.index)));
-   const ruby=document.createElement('ruby'),rt=document.createElement('rt');
-   ruby.append(document.createTextNode(match[0]));rt.textContent=READINGS[match[0]];ruby.append(rt);fragment.append(ruby);
+   for(const part of READING_PARTS[match[0]]){
+    if(!part.reading){fragment.append(document.createTextNode(part.text));continue;}
+    const ruby=document.createElement('ruby'),rt=document.createElement('rt');
+    ruby.append(document.createTextNode(part.text));rt.textContent=part.reading;ruby.append(rt);fragment.append(ruby);
+   }
    at=match.index+match[0].length;
   }
   fragment.append(document.createTextNode(text.slice(at)));node.replaceWith(fragment);

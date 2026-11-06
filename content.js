@@ -176,8 +176,8 @@ const CHECKS=[
 ];
 const HEADLINES=['公園が ごみだらけ!?','みんなで 公園を 掃除','ごみを たくさん 集めたよ'];
 const PHOTO_ITEMS=[
- {id:'name',label:'名札',x:7,y:56,w:23,h:15},
- {id:'address',label:'封筒',x:5,y:10,w:34,h:21},
- {id:'school',label:'学校の マーク',x:66,y:66,w:29,h:19},
- {id:'friend',label:'友達の 顔',x:73,y:10,w:20,h:31}
+ {id:'name',label:'名札',reason:'名前が わかる。',x:7,y:56,w:25,h:17},
+ {id:'address',label:'封筒',reason:'家の 場所が わかる。',x:5,y:9,w:34,h:23},
+ {id:'school',label:'かばんの 学校名',reason:'通う 学校が わかる。',x:67,y:67,w:28,h:18},
+ {id:'friend',label:'友達の 顔',reason:'のせて よいか、気持ちを 聞こう。',x:74,y:10,w:17,h:29}
 ];

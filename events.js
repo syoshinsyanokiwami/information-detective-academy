@@ -16,11 +16,12 @@ document.addEventListener('click',async e=>{const b=e.target.closest('button');i
  if(b.id==='pathUndo'&&!running){state.hunt.order.pop();render('activityTitle');return;}
  if(b.id==='pathClear'&&!running){state.hunt.order=[];render('activityTitle');return;}
  if(b.id==='pathRun'){await runHunt();return;}
+ if(d.photoStage!==undefined){const step=+d.photoStage;if(![0,1,2].includes(step))return;if(step===2)previewPhoto();else{photoStage=step;render('activityTitle');}return;}
  if(d.mask){const id=d.mask;state.photo.hidden=state.photo.hidden.includes(id)?state.photo.hidden.filter(x=>x!==id):[...state.photo.hidden,id];updatePhoto();return;}
  if(b.id==='askFriend'){state.photo.asked=true;updatePhoto();return;}
  if(b.id==='photoReset'){state.photo.hidden=[];state.photo.location=true;state.photo.asked=false;updatePhoto();return;}
  if(b.id==='previewPhoto'){previewPhoto();return;}
- if(b.id==='backToPhoto'){focusAt('activityTitle');return;}
+ if(b.id==='backToPhoto'){photoStage=0;render('activityTitle');return;}
  if(d.maze!==undefined){mazeIndex=+d.maze;render('activityTitle');return;}
  if(d.wall!==undefined&&!running){const n=+d.wall;state.customWalls=state.customWalls.includes(n)?state.customWalls.filter(i=>i!==n):[...state.customWalls,n];state.mazeDone=state.mazeDone.filter(i=>i!==5);editProgram(()=>{});feedback('','mapFeedback');return;}
  if(b.id==='checkMap'){feedback(customMapReachable()?'道が あるよ！ 仲間に 命令を くんでもらおう。':'ゴールへの 道が ふさがっているよ。壁を 減らして見よう。','mapFeedback');return;}
